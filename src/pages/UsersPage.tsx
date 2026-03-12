@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useUsers } from '../hooks/useUsers';
+import { useDebounce } from '../hooks/useDebounce';
 import UserSearch from '../components/users/UserSearch';
 import UserCard from '../components/users/UserCard';
 import UserModal from '../components/users/UserModal';
@@ -22,11 +23,26 @@ const UsersPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 6;
 
-  const filteredUsers = users.filter((user) => {
-    const q = searchQuery.toLowerCase();
-    return user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q);
-  });
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery]);
+
+  const filteredUsers = useMemo(() => {
+    const q = debouncedSearchQuery.toLowerCase();
+    return users.filter(
+      (user) => user.name.toLowerCase().includes(q) || user.email.toLowerCase().includes(q)
+    );
+  }, [users, debouncedSearchQuery]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / usersPerPage));
+  const clampedPage = Math.min(currentPage, totalPages);
+  const startIndex = (clampedPage - 1) * usersPerPage;
+  const paginatedUsers = filteredUsers.slice(startIndex, startIndex + usersPerPage);
 
   const handleCardClick = (user: User) => {
     selectUser(user);
@@ -161,13 +177,49 @@ const UsersPage = () => {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredUsers.map((user) => (
-              <div key={user.id} onClick={() => handleCardClick(user)}>
-                <UserCard user={user} />
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {paginatedUsers.map((user) => (
+                <div key={user.id} onClick={() => handleCardClick(user)}>
+                  <UserCard user={user} />
+                </div>
+              ))}
+            </div>
+            {totalPages > 1 && (
+              <div className="mt-4 flex items-center justify-between text-xs text-slate-400">
+                <button
+                  type="button"
+                  disabled={clampedPage === 1}
+                  onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
+                  className={`inline-flex items-center rounded-full border px-3 py-1 font-medium transition-all duration-200 ${
+                    clampedPage === 1
+                      ? 'border-slate-700 text-slate-600 cursor-not-allowed'
+                      : 'border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700 hover:scale-[1.02] active:scale-[0.98]'
+                  }`}
+                >
+                  Previous
+                </button>
+                <span className="text-[11px] text-slate-400">
+                  Page <span className="font-semibold text-slate-200">{clampedPage}</span> of{' '}
+                  <span className="font-semibold text-slate-200">{totalPages}</span>
+                </span>
+                <button
+                  type="button"
+                  disabled={clampedPage === totalPages}
+                  onClick={() =>
+                    setCurrentPage((prev) => (prev < totalPages ? prev + 1 : prev))
+                  }
+                  className={`inline-flex items-center rounded-full border px-3 py-1 font-medium transition-all duration-200 ${
+                    clampedPage === totalPages
+                      ? 'border-slate-700 text-slate-600 cursor-not-allowed'
+                      : 'border-slate-600 bg-slate-800 text-slate-100 hover:bg-slate-700 hover:scale-[1.02] active:scale-[0.98]'
+                  }`}
+                >
+                  Next
+                </button>
               </div>
-            ))}
-          </div>
+            )}
+          </>
         )}
       </div>
 

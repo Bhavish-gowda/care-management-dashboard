@@ -1,7 +1,7 @@
 import type { User } from '../../types/user';
 import { useUsersContext } from '../../context/UsersContext';
 import { useFormsContext } from '../../context/FormsContext';
-import { formatAddress, formatDateTime } from '../../utils/helpers';
+import { formatAddress, formatDateTime, downloadJson } from '../../utils/helpers';
 import toast from 'react-hot-toast';
 import { X, Trash2 } from 'lucide-react';
 
@@ -27,6 +27,14 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
   const userSubmissions = submissions.filter((s) => s.userId === selectedUser.id);
   const healthAssessments = userSubmissions.filter((s) => s.type === 'healthAssessment');
   const incidentReports = userSubmissions.filter((s) => s.type === 'incidentReport');
+
+  const handleDownloadSubmission = (submission: (typeof userSubmissions)[number]) => {
+    const timestamp = new Date(submission.submittedAt).getTime();
+    const prefix =
+      submission.type === 'healthAssessment' ? 'health-assessment' : 'incident-report';
+    const fileName = `${prefix}-${timestamp}.json`;
+    downloadJson(submission, fileName);
+  };
 
   const renderUserDetails = (user: User) => (
     <div className="space-y-3 text-sm">
@@ -156,6 +164,50 @@ const UserModal = ({ isOpen, onClose }: UserModalProps) => {
                       </span>
                     </div>
                     <p className="text-slate-200 line-clamp-2">{submission.incidentDescription}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                Submission History
+              </h3>
+              <span className="text-[11px] text-slate-500">
+                {userSubmissions.length} submission{submissions.length === 1 ? '' : 's'}
+              </span>
+            </div>
+            {userSubmissions.length === 0 ? (
+              <p className="text-xs text-slate-500">
+                No submissions have been recorded for this user yet.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {userSubmissions.map((submission) => (
+                  <div
+                    key={submission.id}
+                    className="flex items-center justify-between gap-3 rounded-lg border border-white/10 bg-slate-900/80 px-3 py-2 text-xs"
+                  >
+                    <div className="space-y-0.5">
+                      <p className="font-medium text-slate-50">
+                        {submission.type === 'healthAssessment'
+                          ? 'Health Assessment'
+                          : 'Incident Report'}{' '}
+                        · <span className="text-slate-300">{submission.residentName}</span>
+                      </p>
+                      <p className="text-[11px] text-slate-400">
+                        {formatDateTime(submission.submittedAt)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadSubmission(submission)}
+                      className="inline-flex items-center rounded-full border border-slate-600 bg-slate-800 px-3 py-1 text-[11px] font-medium text-slate-100 transition-all duration-200 hover:bg-slate-700 hover:scale-[1.02] active:scale-[0.98]"
+                    >
+                      Download JSON
+                    </button>
                   </div>
                 ))}
               </div>
