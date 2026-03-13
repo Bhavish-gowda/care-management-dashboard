@@ -38,15 +38,12 @@ const IncidentReportForm = () => {
   const { users } = useUsersContext();
   const { addIncidentReport } = useFormsContext();
 
-  const { register, handleSubmit, reset } = useForm<IncidentReportFormValues>({
-    defaultValues
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<IncidentReportFormValues>({
+    defaultValues,
+    mode: 'onBlur'
   });
 
   const onSubmit = (values: IncidentReportFormValues) => {
-    if (!values.userId) {
-      toast.error('Please select a user before submitting.');
-      return;
-    }
     addIncidentReport(values);
     reset(defaultValues);
     toast.success('Incident report submitted successfully.');
@@ -64,7 +61,11 @@ const IncidentReportForm = () => {
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">Select User</label>
               <select
-                {...register('userId', { required: true, valueAsNumber: true })}
+                {...register('userId', { 
+                  required: 'Please select a user', 
+                  valueAsNumber: true,
+                  validate: (value) => value !== 0 || 'Please select a user'
+                })}
                 className={fieldClass}
               >
                 <option value={0}>Select a user...</option>
@@ -74,16 +75,32 @@ const IncidentReportForm = () => {
                   </option>
                 ))}
               </select>
+              {errors.userId && (
+                <p className="mt-1 text-xs text-red-400">{errors.userId.message}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">
                 Resident Name
               </label>
-              <input {...register('residentName')} className={fieldClass} />
+              <input 
+                {...register('residentName', { required: 'Resident name is required' })} 
+                className={fieldClass} 
+              />
+              {errors.residentName && (
+                <p className="mt-1 text-xs text-red-400">{errors.residentName.message}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">Date</label>
-              <input type="date" {...register('date')} className={fieldClass} />
+              <input 
+                type="date" 
+                {...register('date', { required: 'Date is required' })} 
+                className={fieldClass} 
+              />
+              {errors.date && (
+                <p className="mt-1 text-xs text-red-400">{errors.date.message}</p>
+              )}
             </div>
           </div>
 
@@ -92,7 +109,13 @@ const IncidentReportForm = () => {
               <label className="block text-xs font-medium text-slate-200 mb-1">
                 Caregiver Name
               </label>
-              <input {...register('caregiverName')} className={fieldClass} />
+              <input 
+                {...register('caregiverName', { required: 'Caregiver name is required' })} 
+                className={fieldClass} 
+              />
+              {errors.caregiverName && (
+                <p className="mt-1 text-xs text-red-400">{errors.caregiverName.message}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">Time</label>
@@ -158,7 +181,10 @@ const IncidentReportForm = () => {
           <label className="block text-xs font-medium text-slate-200 mb-1">
             Incident Description
           </label>
-          <textarea rows={4} {...register('incidentDescription')} className={fieldClass} />
+          <textarea rows={4} {...register('incidentDescription', { required: 'Incident description is required' })} className={fieldClass} />
+          {errors.incidentDescription && (
+            <p className="mt-1 text-xs text-red-400">{errors.incidentDescription.message}</p>
+          )}
         </div>
       </section>
 

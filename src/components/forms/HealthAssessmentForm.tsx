@@ -57,14 +57,11 @@ const HealthAssessmentForm = () => {
     reset,
     formState: { errors }
   } = useForm<HealthAssessmentFormValues>({
-    defaultValues
+    defaultValues,
+    mode: 'onBlur'
   });
 
   const onSubmit = (values: HealthAssessmentFormValues) => {
-    if (!values.userId) {
-      toast.error('Please select a user before submitting.');
-      return;
-    }
     addHealthAssessment(values);
     reset(defaultValues);
     toast.success('Health assessment submitted successfully.');
@@ -82,7 +79,11 @@ const HealthAssessmentForm = () => {
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">Select User</label>
               <select
-                {...register('userId', { required: 'User is required', valueAsNumber: true })}
+                {...register('userId', { 
+                  required: 'Please select a user', 
+                  valueAsNumber: true,
+                  validate: (value) => value !== 0 || 'Please select a user'
+                })}
                 className={fieldClass}
               >
                 <option value={0}>Select a user...</option>
@@ -104,6 +105,9 @@ const HealthAssessmentForm = () => {
                 {...register('residentName', { required: 'Resident name is required' })}
                 className={fieldClass}
               />
+              {errors.residentName && (
+                <p className="mt-1 text-xs text-red-400">{errors.residentName.message}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">Date</label>
@@ -112,6 +116,9 @@ const HealthAssessmentForm = () => {
                 {...register('date', { required: 'Date is required' })}
                 className={fieldClass}
               />
+              {errors.date && (
+                <p className="mt-1 text-xs text-red-400">{errors.date.message}</p>
+              )}
             </div>
           </div>
 
@@ -124,6 +131,9 @@ const HealthAssessmentForm = () => {
                 {...register('caregiverName', { required: 'Caregiver name is required' })}
                 className={fieldClass}
               />
+              {errors.caregiverName && (
+                <p className="mt-1 text-xs text-red-400">{errors.caregiverName.message}</p>
+              )}
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-200 mb-1">Age</label>

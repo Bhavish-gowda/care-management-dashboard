@@ -34,7 +34,8 @@ const UserForm = ({ initialUser, onSubmit, onCancel }: UserFormProps) => {
     reset,
     formState: { errors }
   } = useForm<FormValues>({
-    defaultValues
+    defaultValues,
+    mode: 'onBlur'
   });
 
   useEffect(() => {
@@ -61,19 +62,31 @@ const UserForm = ({ initialUser, onSubmit, onCancel }: UserFormProps) => {
         <div>
           <label className="block text-xs font-medium text-slate-200 mb-1">Name</label>
           <input
-            {...register('name', { required: 'Name is required' })}
+            {...register('name', { 
+              required: 'Name is required',
+              minLength: {
+                value: 2,
+                message: 'Name must be at least 2 characters'
+              }
+            })}
             className={fieldClass}
           />
-          {errors.name && <p className="mt-1 text-xs text-red-600">{errors.name.message}</p>}
+          {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name.message}</p>}
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-200 mb-1">Email</label>
           <input
             type="email"
-            {...register('email', { required: 'Email is required' })}
+            {...register('email', { 
+              required: 'Email is required',
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: 'Please enter a valid email address'
+              }
+            })}
             className={fieldClass}
           />
-          {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email.message}</p>}
+          {errors.email && <p className="mt-1 text-xs text-red-400">{errors.email.message}</p>}
         </div>
       </div>
 
@@ -81,10 +94,24 @@ const UserForm = ({ initialUser, onSubmit, onCancel }: UserFormProps) => {
         <div>
           <label className="block text-xs font-medium text-slate-200 mb-1">Phone</label>
           <input
-            {...register('phone', { required: 'Phone is required' })}
+            {...register('phone', { 
+              required: 'Phone is required',
+              pattern: {
+                value: /^[0-9]+$/,
+                message: 'Please enter a valid phone number'
+              },
+              minLength: {
+                value: 7,
+                message: 'Please enter a valid phone number'
+              },
+              maxLength: {
+                value: 15,
+                message: 'Please enter a valid phone number'
+              }
+            })}
             className={fieldClass}
           />
-          {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone.message}</p>}
+          {errors.phone && <p className="mt-1 text-xs text-red-400">{errors.phone.message}</p>}
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-200 mb-1">Company</label>

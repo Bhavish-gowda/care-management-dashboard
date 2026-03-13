@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useUsers } from '../hooks/useUsers';
 import { useDebounce } from '../hooks/useDebounce';
+import { useFormsContext } from '../context/FormsContext';
 import UserSearch from '../components/users/UserSearch';
 import UserCard from '../components/users/UserCard';
 import UserModal from '../components/users/UserModal';
@@ -20,11 +21,18 @@ const UsersPage = () => {
     selectedUser,
     setSearchQuery
   } = useUsers();
+  const { submissions } = useFormsContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const usersPerPage = 6;
+
+  // Calculate statistics
+  const totalUsers = users.length;
+  const totalFormsSubmitted = submissions.length;
+  const healthAssessments = submissions.filter(s => s.type === 'healthAssessment').length;
+  const incidentReports = submissions.filter(s => s.type === 'incidentReport').length;
 
   const debouncedSearchQuery = useDebounce(searchQuery, 300);
 
@@ -92,6 +100,26 @@ const UsersPage = () => {
         >
           + Add User
         </button>
+      </div>
+
+      {/* Dashboard Statistics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-sm">
+          <p className="text-slate-400 text-xs uppercase mb-1">Total Users</p>
+          <p className="text-xl font-semibold text-white">{totalUsers}</p>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-sm">
+          <p className="text-slate-400 text-xs uppercase mb-1">Total Forms</p>
+          <p className="text-xl font-semibold text-white">{totalFormsSubmitted}</p>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-sm">
+          <p className="text-slate-400 text-xs uppercase mb-1">Health Assessments</p>
+          <p className="text-xl font-semibold text-white">{healthAssessments}</p>
+        </div>
+        <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-sm">
+          <p className="text-slate-400 text-xs uppercase mb-1">Incident Reports</p>
+          <p className="text-xl font-semibold text-white">{incidentReports}</p>
+        </div>
       </div>
 
       <UserSearch />
