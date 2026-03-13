@@ -8,7 +8,7 @@ This application allows caregivers or administrators to manage users and submit 
 
 ## 🚀 Live Demo
 
-https://care-management-dashboard-vercel.vercel.app
+https://care-management-dashboard1.vercel.app
 
 --------------------------------------------------
 
