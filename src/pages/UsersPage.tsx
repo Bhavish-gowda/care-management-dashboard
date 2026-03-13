@@ -152,21 +152,22 @@ const UsersPage = () => {
             {Array.from({ length: 6 }).map((_, index) => (
               <div
                 key={index}
-                className="group flex flex-col items-start rounded-2xl border border-white/5 bg-slate-900/80 p-4 text-left shadow-sm ring-1 ring-white/5 animate-pulse"
+                className="bg-slate-800 border border-slate-700 rounded-xl p-4 animate-pulse"
               >
                 <div className="flex items-center justify-between w-full mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-slate-800" />
-                    <div className="space-y-1">
-                      <div className="h-3 w-28 rounded-full bg-slate-800" />
-                      <div className="h-2.5 w-20 rounded-full bg-slate-800" />
+                    <div className="h-9 w-9 rounded-full bg-slate-700" />
+                    <div className="space-y-2">
+                      <div className="h-4 w-32 rounded bg-slate-700" />
+                      <div className="h-3 w-24 rounded bg-slate-700" />
                     </div>
                   </div>
-                  <div className="h-4 w-10 rounded-full bg-slate-800" />
+                  <div className="h-4 w-10 rounded-full bg-slate-700" />
                 </div>
-                <div className="space-y-2 w-full">
-                  <div className="h-2.5 w-40 rounded-full bg-slate-800" />
-                  <div className="h-2.5 w-32 rounded-full bg-slate-800" />
+                <div className="space-y-3 w-full">
+                  <div className="h-3 w-full rounded bg-slate-700" />
+                  <div className="h-3 w-5/6 rounded bg-slate-700" />
+                  <div className="h-3 w-4/5 rounded bg-slate-700" />
                 </div>
               </div>
             ))}
